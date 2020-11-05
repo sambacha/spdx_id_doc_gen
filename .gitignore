@@ -6,3 +6,4 @@ __pycache__/
 
 # examples
 examples/
+doc_gen.egg-info/

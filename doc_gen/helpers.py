@@ -4,6 +4,7 @@ import logging
 import os
 from .utils import IGNORE_FILENAMES, SKIP_EXTENSIONS, SKIP_DIRECTORIES, HIDE_DIRECTORIES
 
+
 class ScanData(object):
     def __init__(self):
         self.filename = ""
@@ -31,6 +32,7 @@ def getAllPaths(topDir):
                         paths.append(p)
     return paths
 
+
 def skipDirectory(dir_list, filePath):
     for d in dir_list:
         sd = f"/{d}/"
@@ -41,15 +43,15 @@ def skipDirectory(dir_list, filePath):
 def shouldSkipFile(filePath, glob_to_skip):
     """Returns (True, "reason") if file should be skipped for scanning, (False, "") otherwise."""
     for item in glob_to_skip:
-        if item.startswith('./') and item.endswith('/'):
+        if item.startswith("./") and item.endswith("/"):
             # if item is a directory
-            dir_name1 = item.replace(item[:2], '')
+            dir_name1 = item.replace(item[:2], "")
             dir_name = dir_name1[:-1]
             mk = skipDirectory([dir_name], filePath)
             if mk != None:
                 return mk
-        elif item.startswith('./') and not item.endswith('/'):
-            file_name = item.replace(item[:1], '')
+        elif item.startswith("./") and not item.endswith("/"):
+            file_name = item.replace(item[:1], "")
             if item in filePath:
                 return (True, "skipped file name")
         elif item in filePath:
@@ -59,6 +61,7 @@ def shouldSkipFile(filePath, glob_to_skip):
         return (True, "skipped file extension")
     skipDirectory(SKIP_DIRECTORIES, filePath)
     return (False, "")
+
 
 def parseLineForIdentifier(line):
     """Return parsed SPDX expression if tag found in line, or None otherwise."""
@@ -70,6 +73,7 @@ def parseLineForIdentifier(line):
     identifier = identifier.rstrip("/*")
     identifier = identifier.strip()
     return identifier
+
 
 def getIdentifierData(filePath, glob_to_skip, numLines=20):
     """
@@ -99,7 +103,7 @@ def getIdentifierData(filePath, glob_to_skip, numLines=20):
             "SPDXID": sd.license,
             "scanned": sd.scanned,
             "FileType": None,
-            "FileChecksum": None
+            "FileChecksum": None,
         }
 
     # if we get here, we will scan the file
@@ -121,7 +125,7 @@ def getIdentifierData(filePath, glob_to_skip, numLines=20):
                         "SPDXID": sd.license,
                         "scanned": sd.scanned,
                         "FileType": None,
-                        "FileChecksum": None
+                        "FileChecksum": None,
                     }
         except UnicodeDecodeError:
             # print(f"Encountered invalid UTF-8 content for {filePath}")
@@ -135,7 +139,7 @@ def getIdentifierData(filePath, glob_to_skip, numLines=20):
                 "SPDXID": sd.license,
                 "scanned": sd.scanned,
                 "FileType": None,
-                "FileChecksum": None
+                "FileChecksum": None,
             }
 
     # if we get here, we didn't find an identifier
@@ -146,8 +150,9 @@ def getIdentifierData(filePath, glob_to_skip, numLines=20):
         "SPDXID": "NOASSERTION",
         "scanned": sd.scanned,
         "FileType": None,
-        "FileChecksum": None
+        "FileChecksum": None,
     }
+
 
 def getIdentifierForPaths(paths, glob_to_skip, numLines=20):
     """
@@ -163,12 +168,7 @@ def getIdentifierForPaths(paths, glob_to_skip, numLines=20):
              ScanData is (parsed identifier, line number) if found;
                          (None, -1) if not found.
     """
-    scan_metrics = {
-    "with_id": 0,
-    "without_id": 0,
-    "skipped": 0,
-    "total": len(paths)
-    }
+    scan_metrics = {"with_id": 0, "without_id": 0, "skipped": 0, "total": len(paths)}
     results = []
     for filePath in paths:
         id_data = getIdentifierData(filePath, glob_to_skip, numLines)
@@ -189,16 +189,21 @@ def get_complete_time(function, args=tuple(), kwargs={}):
     ----Decorator----
     Get real, user and system time
     """
+
     def wrappedMethod(*args, **kwargs):
         from time import time as timestamp
         from resource import getrusage as resource_usage, RUSAGE_SELF
+
         start_time, start_resources = timestamp(), resource_usage(RUSAGE_SELF)
         func = function(*args, **kwargs)
         end_resources, end_time = resource_usage(RUSAGE_SELF), timestamp()
-        results = {'real': end_time - start_time,
-                   'sys': end_resources.ru_stime - start_resources.ru_stime,
-                   'user': end_resources.ru_utime - start_resources.ru_utime}
+        results = {
+            "real": end_time - start_time,
+            "sys": end_resources.ru_stime - start_resources.ru_stime,
+            "user": end_resources.ru_utime - start_resources.ru_utime,
+        }
         print("Execution time for {0}".format(function.__name__))
         print(results)
         return func
+
     return wrappedMethod
